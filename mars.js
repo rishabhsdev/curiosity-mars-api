@@ -1,8 +1,30 @@
 import puppeteer from "puppeteer";
 import express from "express";
+import cors from "cors";
 
 const app = express();
+app.use(cors());
 const PORT = 3000;
+
+async function fetchRoverPhotos(rover, sol, apiKey) {
+  const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos`;
+  const params = new URLSearchParams({
+    sol,
+    api_key: "DEMO_KEY",
+  });
+
+  try {
+    const response = await fetch(`${url}?${params}`);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    return data.photos;
+  } catch (error) {
+    console.error("Error fetching rover photos:", error);
+    return [];
+  }
+}
 
 async function scrapeData() {
   const browser = await puppeteer.launch({
@@ -45,6 +67,17 @@ async function scrapeData() {
       maxTemp: maxTemp,
     });
   }
+
+  let photos = await fetchRoverPhotos("curiosity", 3000, "DEMO_KEY");
+  let randomIndex = Math.floor(Math.random() * photos.length) + 1;
+  let randomPhotoUrl = photos[randomIndex].img_src;
+  extractedData.push({
+    imgUrl: randomPhotoUrl,
+  });
+  // for (const photo of photos) {
+  //   const imgSrc = photo.img_src;
+  //   console.log(imgSrc); 
+  // }
 
   console.log("Extracted text:", extractedDate);
   console.log("Extracted data:", extractedData);
