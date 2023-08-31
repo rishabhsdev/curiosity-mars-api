@@ -79,7 +79,7 @@ async function scrapeData() {
   //   console.log(imgSrc); 
   // }
 
-  console.log("Extracted text:", extractedDate);
+  //console.log("Extracted text:", extractedDate);
   console.log("Extracted data:", extractedData);
 
   await browser.close();
